@@ -20,7 +20,7 @@ services:
       SENTRY_POSTGRES_HOST: postgres
       SENTRY_EMAIL_HOST: smtp
     volumes:
-      - sentry_data:/var/lib/sentry/files
+      - ./data/sentry:/var/lib/sentry/files
 
   smtp:
     restart: unless-stopped
@@ -38,7 +38,7 @@ services:
     restart: unless-stopped
     image: postgres:9.5
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./data/postgres:/var/lib/postgresql/data
 
   web:
     restart: unless-stopped
@@ -50,7 +50,9 @@ services:
       - smtp
     ports:
       - '9001:9000'
-
+    environment:
+      - VIRTUAL_HOST=sentry.buckingham.io
+      - VIRTUAL_PORT=9001
   cron:
     restart: unless-stopped
     extends: base
@@ -74,3 +76,11 @@ services:
 volumes:
   postgres_data:
   sentry_data:
+
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
+
+
